@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Новый пользователь</h2>
+<form method="post">
+  <div class="mb-3">
+    <label class="form-label">Логин</label>
+    <input class="form-control" name="username" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Пароль</label>
+    <input type="password" class="form-control" name="password" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Роль</label>
+    <select class="form-select" name="role">
+      <option value="hr">HR проекта</option>
+      <option value="admin">Администратор</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Проект (для HR)</label>
+    <select class="form-select" name="project_id">
+      <option value="">Не назначен</option>
+      {% for project in projects %}
+      <option value="{{ project.id }}">{{ project.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-success" type="submit">Сохранить</button>
+</form>
+{% endblock %}

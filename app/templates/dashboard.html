@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2>Проекты</h2>
+    <p class="text-muted">Управление доступами HR и администраторов, просмотр отметок.</p>
+  </div>
+  {% if g.current_user.has_admin_access() %}
+  <div>
+    <a class="btn btn-outline-primary" href="{{ url_for('new_project') }}">Создать проект</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for('add_user') }}">Создать пользователя</a>
+  </div>
+  {% endif %}
+</div>
+<div class="row g-3">
+  {% for project in projects %}
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">{{ project.name }}</h5>
+        <p class="card-text text-muted">Часовой пояс: {{ project.timezone }}. Начало смены: {{ project.workday_start }}.</p>
+        <a class="btn btn-sm btn-primary" href="{{ url_for('employees', project_id=project.id) }}">Сотрудники</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="mt-5">
+  <h3>Последние отметки</h3>
+  <table class="table table-striped">
+    <thead><tr><th>Сотрудник</th><th>Дата</th><th>Вход</th><th>Выход</th><th>Опоздание</th></tr></thead>
+    <tbody>
+      {% for entry in events %}
+      <tr>
+        <td>{{ entry.employee.full_name }}</td>
+        <td>{{ entry.work_date }}</td>
+        <td>{{ entry.first_check_in or '—' }}</td>
+        <td>{{ entry.last_check_out or '—' }}</td>
+        <td>{% if entry.is_late %}<span class="badge bg-danger">Да</span>{% else %}<span class="badge bg-success">Нет</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

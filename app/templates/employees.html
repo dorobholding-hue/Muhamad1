@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h2>Сотрудники — {{ project.name }}</h2>
+  <a class="btn btn-primary" href="{{ url_for('add_employee', project_id=project.id) }}">Добавить</a>
+</div>
+<table class="table table-hover">
+  <thead><tr><th>Имя</th><th>Код терминала</th><th>Телеграм</th><th></th></tr></thead>
+  <tbody>
+    {% for employee in project.employees %}
+    <tr>
+      <td>{{ employee.full_name }}</td>
+      <td>{{ employee.device_code }}</td>
+      <td>{{ employee.telegram_handle or '—' }}</td>
+      <td><a href="{{ url_for('time_entries', employee_id=employee.id) }}">Отметки</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
