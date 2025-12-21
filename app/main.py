@@ -4,7 +4,6 @@ from typing import Any
 
 from flask import Flask, abort, flash, g, redirect, render_template, request, url_for
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from .auth import login_required, register_default_admin, setup_auth_routes
 from .database import SessionLocal, init_db
@@ -12,6 +11,19 @@ from .hikvision import ingest_device_events
 from .models import Employee, Project, TimeEntry, User
 from .permissions import require_admin, require_project_access
 from .time_service import process_terminal_event
+
+
+def _parse_time(value: str):
+    hours, minutes = value.split(":")
+    return __import__("datetime").time(int(hours), int(minutes))
+
+
+def create_app() -> Flask:
+    app = Flask(__name__)
+    app.config["SECRET_KEY"] = "dev-secret-change-me"
+    init_db()
+    register_routes(app)
+    return app
 
 
 def register_routes(app: Flask) -> None:
@@ -155,15 +167,8 @@ def register_routes(app: Flask) -> None:
         flash("Отметка сохранена", "success")
         return redirect(url_for("time_entries", employee_id=employee_id))
 
-app = Flask(__name__)
-app.config["SECRET_KEY"] = "dev-secret-change-me"
-init_db()
-register_routes(app)
 
-
-def _parse_time(value: str):
-    hours, minutes = value.split(":")
-    return __import__("datetime").time(int(hours), int(minutes))
+app = create_app()
 
 
 if __name__ == "__main__":
