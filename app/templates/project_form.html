@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Создание проекта</h2>
+<form method="post">
+  <div class="mb-3">
+    <label class="form-label">Название</label>
+    <input class="form-control" name="name" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Часовой пояс (IANA)</label>
+    <input class="form-control" name="timezone" value="Europe/Moscow">
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      <label class="form-label">Начало смены</label>
+      <input class="form-control" name="start" value="09:00">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Окончание</label>
+      <input class="form-control" name="end" value="18:00">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Грейс, мин</label>
+      <input class="form-control" name="grace" value="5">
+    </div>
+  </div>
+  <button class="btn btn-success mt-3" type="submit">Создать</button>
+</form>
+{% endblock %}

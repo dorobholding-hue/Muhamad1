@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2>Отметки — {{ employee.full_name }}</h2>
+    <p class="text-muted">Проект: {{ employee.project.name }}</p>
+  </div>
+  <form method="post" action="{{ url_for('manual_check') }}" class="d-flex align-items-center gap-2">
+    <input type="hidden" name="employee_id" value="{{ employee.id }}">
+    <input type="datetime-local" name="timestamp" class="form-control" required>
+    <select name="direction" class="form-select">
+      <option value="in">Вход</option>
+      <option value="out">Выход</option>
+    </select>
+    <button class="btn btn-outline-primary" type="submit">Добавить вручную</button>
+  </form>
+</div>
+<table class="table table-bordered">
+  <thead><tr><th>Дата</th><th>Первый вход</th><th>Последний выход</th><th>Опоздание</th></tr></thead>
+  <tbody>
+    {% for entry in entries %}
+    <tr>
+      <td>{{ entry.work_date }}</td>
+      <td>{{ entry.first_check_in or '—' }}</td>
+      <td>{{ entry.last_check_out or '—' }}</td>
+      <td>{% if entry.is_late %}<span class="badge bg-danger">Да</span>{% else %}<span class="badge bg-success">Нет</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
