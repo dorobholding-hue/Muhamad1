@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from flask import Flask, abort, flash, g, redirect, render_template, request, url_for
 from sqlalchemy import select
+from werkzeug.utils import secure_filename
 
 from .auth import login_required, register_default_admin, setup_auth_routes
 from .database import SessionLocal, init_db
-from .hikvision import ingest_device_events
+from .hikvision import HikvisionClient, ingest_device_events
 from .models import Employee, Project, TimeEntry, User
 from .permissions import require_admin, require_project_access
 from .time_service import process_terminal_event
@@ -21,6 +23,8 @@ def _parse_time(value: str):
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config["SECRET_KEY"] = "dev-secret-change-me"
+    app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "uploads")
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     init_db()
     register_routes(app)
     return app
@@ -89,14 +93,25 @@ def register_routes(app: Flask) -> None:
                 full_name = request.form.get("full_name", "")
                 device_code = request.form.get("device_code", "")
                 telegram_handle = request.form.get("telegram_handle")
+                photo_file = request.files.get("face_photo")
+                photo_path = None
+                if photo_file and photo_file.filename:
+                    filename = secure_filename(photo_file.filename)
+                    photo_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                    photo_file.save(photo_path)
                 employee = Employee(
                     project_id=project.id,
                     full_name=full_name,
                     device_code=device_code,
                     telegram_handle=telegram_handle,
+                    face_image_path=photo_path,
                 )
                 db.add(employee)
                 db.commit()
+                if photo_path:
+                    client = HikvisionClient()
+                    success, message = client.upload_face(employee, photo_path)
+                    flash(message, "success" if success else "warning")
                 flash("Сотрудник добавлен", "success")
                 return redirect(url_for("employees", project_id=project.id))
             return render_template("employee_form.html", project=project)

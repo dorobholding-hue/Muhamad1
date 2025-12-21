@@ -35,6 +35,32 @@ class HikvisionClient:
         except Exception:
             return []
 
+    def upload_face(self, employee: Employee, image_path: str) -> tuple[bool, str]:
+        if not self.host or not self.username or not self.password:
+            return False, "Не заданы параметры терминала HIKVISION_*"
+        url = f"https://{self.host}/ISAPI/Intelligent/FDLib/FaceDataRecord?format=json"
+        try:
+            with open(image_path, "rb") as file:
+                files = {"FaceImage": file}
+                data = {
+                    "faceLibType": "blackFD",
+                    "FDID": "1",
+                    "FPID": str(employee.device_code),
+                    "name": employee.full_name,
+                }
+                response = requests.post(
+                    url,
+                    auth=(self.username, self.password),
+                    files=files,
+                    data=data,
+                    timeout=10,
+                    verify=False,
+                )
+            response.raise_for_status()
+            return True, "Фото синхронизировано"
+        except Exception as exc:
+            return False, f"Ошибка синхронизации: {exc}"
+
 
 def ingest_device_events(db_session, payload: Iterable[dict]) -> list[TerminalEvent]:
     ingested: list[TerminalEvent] = []
@@ -60,4 +86,3 @@ def ingest_device_events(db_session, payload: Iterable[dict]) -> list[TerminalEv
         )
         ingested.append(saved_event)
     return ingested
-

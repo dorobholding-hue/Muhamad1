@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Новый сотрудник — {{ project.name }}</h2>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
   <div class="mb-3">
     <label class="form-label">Полное имя</label>
     <input class="form-control" name="full_name" required>
@@ -13,6 +13,10 @@
   <div class="mb-3">
     <label class="form-label">Telegram @username (необязательно)</label>
     <input class="form-control" name="telegram_handle">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Фото для Face ID (JPG/PNG)</label>
+    <input type="file" class="form-control" name="face_photo" accept="image/*">
   </div>
   <button class="btn btn-success" type="submit">Сохранить</button>
   <a class="btn btn-link" href="{{ url_for('employees', project_id=project.id) }}">Отмена</a>

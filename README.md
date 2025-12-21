@@ -9,6 +9,8 @@
 - Webhook `/api/hikvision/events` для приёма событий с терминала DS-K1T341AM.
 - Заготовка клиента `HikvisionClient` для опроса ISAPI `alertStream` (безопасность: переменные окружения).
 - Отправка уведомлений в Telegram при опоздании (переменные окружения `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`).
+- Привязка Telegram-чата через polling-бота (`python -m app.telegram_bot`).
+- Опциональная синхронизация Face ID (загрузка фото при добавлении сотрудника).
 
 ## Быстрый старт (локально / PyCharm)
 1. Создайте виртуальное окружение и установите зависимости:
@@ -31,12 +33,17 @@
   [{ "employeeCode": "123", "timestamp": "2024-06-01T09:10:00", "direction": "in" }]
   ```
 - Для опроса по ISAPI задайте переменные `HIKVISION_HOST`, `HIKVISION_USER`, `HIKVISION_PASSWORD` и используйте `HikvisionClient.fetch_events()` (например, по расписанию cron) и `ingest_device_events` для записи в базу.
+- Для синхронизации Face ID при создании сотрудника также нужны `HIKVISION_*` переменные.
 
 ## Настройка Telegram-оповещений
 - Создайте бота и сохраните токен/чат:
   ```bash
   export TELEGRAM_BOT_TOKEN=<token>
   export TELEGRAM_CHAT_ID=<channel_or_chat_id>
+  ```
+- Либо запустите polling-бота и отправьте ему `/start`, чтобы чат сохранился в базе:
+  ```bash
+  python -m app.telegram_bot
   ```
 - При первой отметке «вход» с опозданием функция `notify_late` отправит сообщение.
 

@@ -50,6 +50,7 @@ class Employee(Base):
     full_name: Mapped[str] = mapped_column(String(120), nullable=False)
     device_code: Mapped[str] = mapped_column(String(64), nullable=False)
     telegram_handle: Mapped[Optional[str]] = mapped_column(String(120))
+    face_image_path: Mapped[Optional[str]] = mapped_column(String(255))
 
     project: Mapped[Project] = relationship("Project", back_populates="employees")
     time_entries: Mapped[list["TimeEntry"]] = relationship("TimeEntry", back_populates="employee")
@@ -87,3 +88,10 @@ class TimeEntry(Base):
 
     employee: Mapped[Employee] = relationship("Employee", back_populates="time_entries")
 
+
+class Setting(Base):
+    __tablename__ = "settings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    key: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    value: Mapped[str] = mapped_column(String(255), nullable=False)
